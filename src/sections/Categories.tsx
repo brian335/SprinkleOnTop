@@ -10,6 +10,7 @@ import {
   accentBg,
   cx,
 } from '../components/ui'
+import { Photo, useImageExists } from '../components/Photo'
 import { propMap } from '../three/Props'
 import { Stage3D } from '../three/Stage'
 import { useIsDesktop } from '../lib/hooks'
@@ -37,6 +38,9 @@ function CategoryCard({ item, index }: { item: Category; index: number }) {
   // it back until the card has actually been revealed or it floats over blank
   // page while the card is still invisible.
   const revealed = useInView(ref, { once: true, amount: 0.25 })
+  // With a real photo in the window the prop becomes a small corner mascot;
+  // without one it stays centred and carries the card on its own.
+  const hasPhoto = useImageExists(item.image) === true
 
   return (
     <StaggerItem className="[perspective:1200px]">
@@ -44,16 +48,23 @@ function CategoryCard({ item, index }: { item: Category; index: number }) {
         {/* The prop sits in its own untilted layer so the tracked viewport
             stays rock steady while the card underneath pitches. */}
         {revealed && (
-        <Stage3D
-          className="pointer-events-none absolute inset-x-0 top-1 z-10 h-48"
-          distance={frame.distance}
-          elevation={frame.elevation}
-          spin={isDesktop ? 0.3 : 0}
-          tilt={0.45}
-          floatIntensity={0.35}
-        >
-          <Prop accent={item.accent} />
-        </Stage3D>
+          <Stage3D
+            className={
+              hasPhoto
+                ? // tucked into the window's bottom-right, clear of the number
+                  // badge, the price chip and the title beneath
+                  'pointer-events-none absolute top-[6.5rem] right-1 z-10 h-26 w-26'
+                : 'pointer-events-none absolute inset-x-0 top-1 z-10 h-48'
+            }
+            distance={frame.distance * (hasPhoto ? 1.05 : 1)}
+            elevation={frame.elevation}
+            spin={isDesktop ? 0.3 : 0}
+            tilt={0.45}
+            floatIntensity={0.35}
+            shadow={hasPhoto ? 'none' : 'fake'}
+          >
+            <Prop accent={item.accent} />
+          </Stage3D>
         )}
 
         <TiltCard max={7} lift={20} className="h-full">
@@ -63,17 +74,28 @@ function CategoryCard({ item, index }: { item: Category; index: number }) {
             rel="noreferrer"
             className="group flex h-full flex-col overflow-hidden rounded-[2rem] border-2 border-ink bg-paper shadow-[6px_6px_0_var(--color-ink)] transition-shadow duration-300 hover:shadow-[10px_10px_0_var(--color-ink)]"
           >
-            {/* tinted window the prop floats inside */}
-            <div className={cx('relative h-48 overflow-hidden border-b-2 border-ink', accentBg[item.accent])}>
-              <div className="absolute inset-0 opacity-45 [background:radial-gradient(circle_at_50%_120%,#fff_0%,transparent_60%)]" />
-              <div
-                aria-hidden
-                className="absolute inset-0 opacity-[0.14] [background-image:radial-gradient(var(--color-ink)_1.5px,transparent_1.5px)] [background-size:14px_14px]"
-              />
+            {/* the window: a real photo when there is one, otherwise a tinted
+                panel for the 3D prop to float inside */}
+            <Photo
+              src={item.image}
+              alt={item.alt}
+              accent={item.accent}
+              className="h-48 border-b-2 border-ink"
+              imgClassName="transition-transform duration-700 ease-[var(--ease-soft)] group-hover:scale-[1.06]"
+              placeholder={
+                <>
+                  <div className="absolute inset-0 opacity-45 [background:radial-gradient(circle_at_50%_120%,#fff_0%,transparent_60%)]" />
+                  <div
+                    aria-hidden
+                    className="absolute inset-0 opacity-[0.14] [background-image:radial-gradient(var(--color-ink)_1.5px,transparent_1.5px)] [background-size:14px_14px]"
+                  />
+                </>
+              }
+            >
               <span className="absolute top-3 right-3 rounded-full border-2 border-ink bg-paper px-3 py-1 text-xs font-extrabold">
                 from {item.priceFrom}
               </span>
-            </div>
+            </Photo>
 
             <div className="flex flex-1 flex-col gap-3 p-6">
               <h3 className="text-2xl font-semibold">{item.name}</h3>

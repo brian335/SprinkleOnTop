@@ -22,6 +22,22 @@ export const whatsappLink = (message: string = site.whatsappMessage) =>
 
 /* -------------------------------------------------------------------------- */
 
+/**
+ * Image paths, all relative to /public. Every one of these is optional at
+ * runtime — drop a file at the path and it appears, leave it missing and the
+ * component falls back to its placeholder. Nothing needs rewiring.
+ *
+ * See public/README.md for sizes and naming.
+ */
+export const images = {
+  /** the real sticker artwork; falls back to the drawn SVG mark */
+  logo: '/brand/logo.png',
+  /** portrait for the About section */
+  owner: '/photos/ragini.jpg',
+} as const
+
+/* -------------------------------------------------------------------------- */
+
 export type AccentName = 'berry' | 'butter' | 'mint' | 'grape' | 'tangerine' | 'sky'
 
 /** Hex values mirror the `--color-*` tokens; the 3D scene needs raw hex. */
@@ -45,6 +61,13 @@ export type Category = {
   accent: AccentName
   /** which procedural 3D prop to render on the card */
   prop: 'cake' | 'cupcake' | 'bun' | 'cookie' | 'healthy' | 'donut'
+  /**
+   * Photo for the card window. When the file exists the 3D prop shrinks to a
+   * corner accent; when it is missing the prop stays centred and large.
+   */
+  image: string
+  /** describes the actual bake for screen readers and search */
+  alt: string
   tags: string[]
 }
 
@@ -58,6 +81,8 @@ export const categories: Category[] = [
     priceFrom: '₹850',
     accent: 'berry',
     prop: 'cake',
+    image: '/photos/cakes.jpg',
+    alt: 'A layered celebration cake hand-frosted by Sprinkle On Top',
     tags: ['Eggless option', 'Custom themes', '500g – 3kg'],
   },
   {
@@ -69,6 +94,8 @@ export const categories: Category[] = [
     priceFrom: '₹360 / 6',
     accent: 'grape',
     prop: 'cupcake',
+    image: '/photos/cupcakes.jpg',
+    alt: 'A box of buttercream-swirled cupcakes',
     tags: ['Box of 6 or 12', 'Party favours', 'Mix & match'],
   },
   {
@@ -80,6 +107,8 @@ export const categories: Category[] = [
     priceFrom: '₹240 / 4',
     accent: 'mint',
     prop: 'bun',
+    image: '/photos/korean-buns.jpg',
+    alt: 'Korean cream buns split and filled with whipped cream',
     tags: ['Baked fresh daily', 'Cream filled', 'Limited batches'],
   },
   {
@@ -91,6 +120,8 @@ export const categories: Category[] = [
     priceFrom: '₹280 / 6',
     accent: 'tangerine',
     prop: 'cookie',
+    image: '/photos/cookies.jpg',
+    alt: 'Thick chewy cookies stacked on a board',
     tags: ['Gift jars', 'Chewy centre', 'Bakes to order'],
   },
   {
@@ -102,6 +133,8 @@ export const categories: Category[] = [
     priceFrom: '₹320 / 6',
     accent: 'sky',
     prop: 'healthy',
+    image: '/photos/healthy-bakes.jpg',
+    alt: 'Jaggery and millet cookies from the healthy bakes range',
     tags: ['No refined sugar', 'Whole grain', 'Kid approved'],
   },
   {
@@ -113,6 +146,8 @@ export const categories: Category[] = [
     priceFrom: '₹950',
     accent: 'butter',
     prop: 'donut',
+    image: '/photos/hampers.jpg',
+    alt: 'A ribboned festive hamper of assorted bakes',
     tags: ['Corporate bulk', 'Gift wrapped', 'Custom notes'],
   },
 ]
@@ -126,6 +161,9 @@ export type Bestseller = {
   price: string
   accent: AccentName
   badge?: string
+  /** photo for the card; falls back to a patterned swatch when missing */
+  image: string
+  alt: string
 }
 
 export const bestsellers: Bestseller[] = [
@@ -136,6 +174,8 @@ export const bestsellers: Bestseller[] = [
     price: '₹1,150',
     accent: 'tangerine',
     badge: 'Most ordered',
+    image: '/photos/biscoff-cheesecake.jpg',
+    alt: 'A slice of Biscoff cheesecake topped with cookie butter',
   },
   {
     id: 'red-velvet',
@@ -144,6 +184,8 @@ export const bestsellers: Bestseller[] = [
     price: '₹550',
     accent: 'berry',
     badge: 'Same-day',
+    image: '/photos/red-velvet-bento.jpg',
+    alt: 'A small red velvet bento cake in its box',
   },
   {
     id: 'garlic-bun',
@@ -151,6 +193,8 @@ export const bestsellers: Bestseller[] = [
     note: 'Savoury, buttery, gone in a minute.',
     price: '₹90',
     accent: 'mint',
+    image: '/photos/garlic-cream-bun.jpg',
+    alt: 'A garlic butter cream bun torn open',
   },
   {
     id: 'brownie',
@@ -158,6 +202,8 @@ export const bestsellers: Bestseller[] = [
     note: 'Nine squares of dense chocolate.',
     price: '₹480',
     accent: 'grape',
+    image: '/photos/fudge-brownies.jpg',
+    alt: 'A box of nine fudge brownie squares',
   },
   {
     id: 'millet',
@@ -166,6 +212,8 @@ export const bestsellers: Bestseller[] = [
     price: '₹320',
     accent: 'sky',
     badge: 'No refined sugar',
+    image: '/photos/millet-cookies.jpg',
+    alt: 'Millet and jaggery cookies in a gift jar',
   },
   {
     id: 'pinata',
@@ -173,6 +221,8 @@ export const bestsellers: Bestseller[] = [
     note: 'Smash it open, chocolates fall out.',
     price: '₹1,400',
     accent: 'butter',
+    image: '/photos/pinata-heart-cake.jpg',
+    alt: 'A pinata heart cake with chocolates spilling out',
   },
 ]
 

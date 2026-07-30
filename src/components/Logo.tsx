@@ -1,11 +1,31 @@
+import { useState } from 'react'
 import { cx } from './ui'
+import { images, site } from '../lib/site'
 
 /**
- * Stand-in for the printed sticker logo, drawn as SVG so it stays crisp and
- * can animate. Swap in the real artwork by dropping `logo.png` into /public
- * and pointing <LogoMark> at it — the layout does not change.
+ * The brand mark. Uses the real sticker artwork when it is present at
+ * `images.logo`, and falls back to the drawn SVG below if that file is
+ * missing — so the header is never broken while the artwork is in transit.
  */
 export function LogoMark({ className, animated = true }: { className?: string; animated?: boolean }) {
+  const [artworkFailed, setArtworkFailed] = useState(false)
+
+  if (!artworkFailed) {
+    return (
+      <img
+        src={images.logo}
+        alt={`${site.name} logo`}
+        className={cx('shrink-0 rounded-full object-contain', className)}
+        onError={() => setArtworkFailed(true)}
+      />
+    )
+  }
+
+  return <DrawnMark className={className} animated={animated} />
+}
+
+/** Hand-drawn stand-in, used only until the real artwork is in place. */
+function DrawnMark({ className, animated }: { className?: string; animated?: boolean }) {
   return (
     <svg viewBox="0 0 100 100" className={cx('shrink-0', className)} role="img" aria-label="Sprinkle On Top">
       <circle cx="50" cy="50" r="47" fill="var(--color-paper)" stroke="var(--color-ink)" strokeWidth="3" />

@@ -1,10 +1,11 @@
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef } from 'react'
 import { Button, Eyebrow, Reveal, Squiggle, WhatsAppIcon, cx } from '../components/ui'
+import { Photo } from '../components/Photo'
 import { Cupcake } from '../three/Props'
 import { Stage3D } from '../three/Stage'
 import { useIsDesktop } from '../lib/hooks'
-import { site, stats, whatsappLink } from '../lib/site'
+import { images, site, stats, whatsappLink } from '../lib/site'
 
 export function About() {
   const ref = useRef<HTMLDivElement>(null)
@@ -17,18 +18,27 @@ export function About() {
       <div className="mx-auto grid w-full max-w-6xl items-center gap-14 lg:grid-cols-[0.9fr_1.1fr]">
         {/* portrait slot ------------------------------------------------- */}
         <motion.div style={{ y: isDesktop ? y : 0 }} className="relative mx-auto w-full max-w-sm">
-          <div className="relative aspect-[4/5] rotate-[-3deg] overflow-hidden rounded-[2.5rem] border-2 border-ink bg-cream-deep shadow-[10px_10px_0_var(--color-ink)]">
-            <div className="absolute inset-0 opacity-50 [background:radial-gradient(circle_at_60%_20%,#fff_0%,transparent_60%)]" />
-            <div
-              aria-hidden
-              className="absolute inset-0 opacity-[0.18] [background-image:radial-gradient(var(--color-ink)_1.5px,transparent_1.5px)] [background-size:16px_16px]"
-            />
-            <span className="absolute inset-x-0 bottom-8 text-center font-hand text-3xl text-ink-soft">
-              a photo of Ragini
-              <br />
-              goes here
-            </span>
-          </div>
+          <Photo
+            src={images.owner}
+            alt={`${site.owner}, the baker behind ${site.name}`}
+            accent="butter"
+            className="aspect-[4/5] rotate-[-3deg] rounded-[2.5rem] border-2 border-ink shadow-[10px_10px_0_var(--color-ink)]"
+            placeholder={
+              <>
+                <div className="absolute inset-0 bg-cream-deep" />
+                <div className="absolute inset-0 opacity-50 [background:radial-gradient(circle_at_60%_20%,#fff_0%,transparent_60%)]" />
+                <div
+                  aria-hidden
+                  className="absolute inset-0 opacity-[0.18] [background-image:radial-gradient(var(--color-ink)_1.5px,transparent_1.5px)] [background-size:16px_16px]"
+                />
+                <span className="absolute inset-x-0 bottom-8 text-center font-hand text-3xl text-ink-soft">
+                  a photo of Ragini
+                  <br />
+                  goes here
+                </span>
+              </>
+            }
+          />
 
           {/* 3D cupcake perched on the corner of the frame */}
           <Stage3D

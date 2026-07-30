@@ -43,9 +43,9 @@
 @layer base {
   html {
     -webkit-tap-highlight-color: transparent;
-    /* `clip` rather than `hidden` so it never turns into a scroll container
-       and breaks the sticky sections */
-    overflow-x: clip;
+    /* Deliberately no overflow-x here: any value other than `visible` — `clip`
+       included — stops `position: sticky` working in the sections below.
+       Sideways overflow is contained at the element that causes it instead. */
   }
 
   body {

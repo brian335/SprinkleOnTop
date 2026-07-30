@@ -52,16 +52,26 @@ ink, and the six candy accents from the drawn icons. Buttons, cards and chips al
 share one die-cut treatment (2px ink border, hard offset shadow) so the page
 reads as a sheet of stickers.
 
+## Images
+
+Every image on the site is optional at runtime. Drop a file at the expected path
+in `public/` and it appears; leave it missing and the component falls back to a
+placeholder. **No code changes are needed to add photography** — see
+[`public/README.md`](public/README.md) for the full list of filenames and sizes.
+
+The `Photo` component holds the placeholder underneath until the real file has
+actually decoded, so a missing or slow image never leaves a blank hole. Menu
+cards go one step further: when a real photo exists the 3D prop shrinks to a
+small corner accent and lets the photo carry the card; when it doesn't, the prop
+stays centred and large.
+
 ## What still needs Ragini
 
-The structure and design are done. These are the content gaps, all marked in the
-code:
+The structure and design are done. These are the remaining gaps:
 
-- **Logo** — `components/Logo.tsx` draws an SVG stand-in of the sticker. Drop the
-  real artwork into `public/` and point `LogoMark` at it.
-- **Photos** — `sections/Bestsellers.tsx` renders a patterned colour swatch per
-  item (`PhotoSlot`); replace it with an `<img>` and nothing else changes.
-  `sections/About.tsx` has a framed slot for a photo of Ragini.
+- **Logo** — drop the real sticker artwork at `public/brand/logo.png`. Until
+  then the header draws an SVG approximation, which is not a substitute.
+- **Photos** — see `public/README.md` for the thirteen filenames.
 - **Prices** — everything in `lib/site.ts` marked `priceFrom` / `price` is a
   placeholder pending her actual rate card.
 - **Testimonials and stats** — written as realistic examples in `lib/site.ts`;

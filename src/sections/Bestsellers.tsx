@@ -1,30 +1,26 @@
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useLayoutEffect, useRef, useState } from 'react'
-import { Button, Eyebrow, Reveal, WhatsAppIcon, accentBg, cx } from '../components/ui'
+import { Button, Eyebrow, Reveal, WhatsAppIcon } from '../components/ui'
+import { Photo } from '../components/Photo'
 import { useIsDesktop } from '../lib/hooks'
 import { bestsellers, whatsappLink, type Bestseller } from '../lib/site'
 
-/**
- * Photo slot. Until Ragini's shots are in, this renders a patterned swatch in
- * the item's accent — drop an <img> here and nothing else needs to change.
- */
 function PhotoSlot({ item }: { item: Bestseller }) {
   return (
-    <div className={cx('relative aspect-[4/3] overflow-hidden border-b-2 border-ink', accentBg[item.accent])}>
-      <div className="absolute inset-0 opacity-40 [background:radial-gradient(circle_at_30%_0%,#fff_0%,transparent_55%)]" />
-      <div
-        aria-hidden
-        className="absolute inset-0 opacity-20 [background-image:repeating-linear-gradient(45deg,var(--color-ink)_0_2px,transparent_2px_16px)]"
-      />
-      <span className="absolute inset-0 flex items-center justify-center font-display text-7xl font-extrabold text-paper/80 select-none">
-        {item.name.charAt(0)}
-      </span>
+    <Photo
+      src={item.image}
+      alt={item.alt}
+      accent={item.accent}
+      fallbackLabel={item.name.charAt(0)}
+      className="aspect-[4/3] border-b-2 border-ink"
+      imgClassName="transition-transform duration-700 ease-[var(--ease-soft)] group-hover:scale-[1.06]"
+    >
       {item.badge && (
         <span className="absolute top-3 left-3 rounded-full border-2 border-ink bg-paper px-3 py-1 text-[0.7rem] font-extrabold tracking-wide uppercase">
           {item.badge}
         </span>
       )}
-    </div>
+    </Photo>
   )
 }
 
