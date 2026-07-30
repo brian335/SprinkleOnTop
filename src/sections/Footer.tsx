@@ -1,6 +1,7 @@
+import { Link } from 'react-router-dom'
 import { LogoMark, Wordmark } from '../components/Logo'
 import { InstagramIcon, Squiggle, WhatsAppIcon } from '../components/ui'
-import { categories, nav, site, whatsappLink } from '../lib/site'
+import { cakeStyles, otherBakes, nav, site, whatsappLink } from '../lib/site'
 
 export function Footer() {
   return (
@@ -13,7 +14,9 @@ export function Footer() {
             <LogoMark className="h-14 w-14" animated={false} />
             <Wordmark />
           </div>
-          <p className="max-w-xs text-sm text-ink-soft">{site.tagline}. Baked in {site.city}.</p>
+          <p className="max-w-xs text-sm text-ink-soft">
+            Custom cakes baked at home in {site.city}. {site.tagline}.
+          </p>
           <div className="flex gap-3">
             <a
               href={whatsappLink()}
@@ -39,18 +42,30 @@ export function Footer() {
         <nav className="flex flex-col gap-3">
           <h3 className="text-xs font-bold tracking-[0.16em] text-ink-faint uppercase">Explore</h3>
           {nav.map((item) => (
-            <a key={item.href} href={item.href} className="text-sm font-semibold text-ink-soft hover:text-berry">
+            <Link
+              key={item.href}
+              to={item.href}
+              className="text-sm font-semibold text-ink-soft hover:text-berry"
+            >
               {item.label}
-            </a>
+            </Link>
           ))}
         </nav>
 
         <nav className="flex flex-col gap-3">
-          <h3 className="text-xs font-bold tracking-[0.16em] text-ink-faint uppercase">What she bakes</h3>
-          {categories.map((c) => (
-            <a key={c.id} href="#menu" className="text-sm font-semibold text-ink-soft hover:text-berry">
+          <h3 className="text-xs font-bold tracking-[0.16em] text-ink-faint uppercase">Cakes</h3>
+          {cakeStyles.map((c) => (
+            <Link key={c.id} to="/#cakes" className="text-sm font-semibold text-ink-soft hover:text-berry">
               {c.name}
-            </a>
+            </Link>
+          ))}
+          <h3 className="mt-3 text-xs font-bold tracking-[0.16em] text-ink-faint uppercase">
+            Also baking
+          </h3>
+          {otherBakes.map((b) => (
+            <Link key={b.id} to="/more" className="text-sm font-semibold text-ink-soft hover:text-berry">
+              {b.name}
+            </Link>
           ))}
         </nav>
 
@@ -59,10 +74,17 @@ export function Footer() {
           <a href={`tel:${site.phone}`} className="font-display text-lg font-bold hover:text-berry">
             {site.phoneDisplay}
           </a>
-          <a href={site.instagram} target="_blank" rel="noreferrer" className="text-sm font-semibold text-ink-soft hover:text-berry">
+          <a
+            href={site.instagram}
+            target="_blank"
+            rel="noreferrer"
+            className="text-sm font-semibold text-ink-soft hover:text-berry"
+          >
             {site.instagramHandle}
           </a>
-          <p className="text-sm text-ink-soft">Orders close 48 hours before your date.</p>
+          <p className="text-sm text-ink-soft">
+            Cakes close 48 hours ahead — tiered ones a week.
+          </p>
         </div>
       </div>
 

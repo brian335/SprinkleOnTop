@@ -2,14 +2,17 @@ import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef } from 'react'
 import { Button, Eyebrow, Reveal, Squiggle, WhatsAppIcon, cx } from '../components/ui'
 import { Photo } from '../components/Photo'
-import { Cupcake } from '../three/Props'
+import { PhotoSlab, usePhotoTexture } from '../three/PhotoSlab'
 import { Stage3D } from '../three/Stage'
 import { useIsDesktop } from '../lib/hooks'
-import { images, site, stats, whatsappLink } from '../lib/site'
+import { cakeById, images, site, stats, whatsappLink } from '../lib/site'
 
 export function About() {
   const ref = useRef<HTMLDivElement>(null)
   const isDesktop = useIsDesktop()
+  // a real cake propped against the frame, rather than a made-up one
+  const sideCake = cakeById('carnation-cream')
+  const sideTexture = usePhotoTexture(sideCake.image)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] })
   const y = useTransform(scrollYProgress, [0, 1], [40, -40])
 
@@ -40,16 +43,24 @@ export function About() {
             }
           />
 
-          {/* 3D cupcake perched on the corner of the frame */}
-          <Stage3D
-            className="pointer-events-none absolute -right-4 -bottom-14 z-10 h-44 w-44 sm:-right-14 sm:-bottom-16 sm:h-56 sm:w-56"
-            distance={4.2}
-            elevation={12}
-            spin={0.34}
-            tilt={0.6}
-          >
-            <Cupcake accent="grape" />
-          </Stage3D>
+          {/* a real cake propped against the corner of the frame */}
+          {sideTexture && (
+            <Stage3D
+              className="pointer-events-none absolute -right-6 -bottom-16 z-10 h-52 w-44 sm:-right-16 sm:-bottom-20 sm:h-64 sm:w-56"
+              distance={5.6}
+              elevation={5}
+              spin={0}
+              tilt={0.7}
+              shadow="contact"
+            >
+              <PhotoSlab
+                texture={sideTexture}
+                maxWidth={2.4}
+                maxHeight={3}
+                accent={sideCake.accent}
+              />
+            </Stage3D>
+          )}
 
           <motion.span
             initial={{ scale: 0, rotate: -20 }}

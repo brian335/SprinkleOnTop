@@ -1,10 +1,10 @@
 import { motion } from 'framer-motion'
 import { Button, InstagramIcon, Reveal, WhatsAppIcon } from '../components/ui'
-import { Donut } from '../three/Props'
+import { PhotoSlab, usePhotoTexture } from '../three/PhotoSlab'
 import { Sprinkles } from '../three/Sprinkles'
 import { Stage3D } from '../three/Stage'
 import { useIsDesktop } from '../lib/hooks'
-import { site, whatsappLink } from '../lib/site'
+import { cakeById, site, whatsappLink } from '../lib/site'
 
 const details = [
   { label: 'WhatsApp & calls', value: site.phoneDisplay, href: `tel:${site.phone}` },
@@ -15,6 +15,8 @@ const details = [
 
 export function Contact() {
   const isDesktop = useIsDesktop()
+  const cake = cakeById('butterfly-pullup')
+  const texture = usePhotoTexture(cake.image)
 
   return (
     <section id="contact" className="px-4 pb-20 sm:px-8">
@@ -25,18 +27,18 @@ export function Contact() {
           <div className="absolute -right-16 bottom-0 h-80 w-80 rounded-full bg-mint/25 blur-3xl" />
         </div>
 
-        {isDesktop && (
+        {isDesktop && texture && (
           <Stage3D
-            className="pointer-events-none absolute top-4 right-2 h-80 w-80 lg:h-[26rem] lg:w-[26rem]"
-            distance={5.2}
-            elevation={26}
-            spin={0.4}
-            tilt={0.8}
+            className="pointer-events-none absolute top-8 right-4 h-[22rem] w-72 lg:h-[26rem] lg:w-80"
+            distance={6.4}
+            elevation={5}
+            spin={0}
+            tilt={0.9}
             shadow="none"
             lightIntensity={1.15}
           >
-            <Donut accent="butter" />
-            <Sprinkles count={40} spread={[2.6, 2, 1.4]} size={0.9} />
+            <PhotoSlab texture={texture} maxWidth={2.6} maxHeight={3.4} accent={cake.accent} />
+            <Sprinkles count={38} spread={[2.8, 2.4, 1.4]} size={0.9} />
           </Stage3D>
         )}
 

@@ -375,13 +375,50 @@ export function Donut({ accent = 'butter' }: Props) {
 
 /* -------------------------------------------------------------------------- */
 
-export const propMap = {
-  cake: Cake,
-  cupcake: Cupcake,
-  bun: Bun,
-  cookie: Cookie,
-  healthy: HealthyCookie,
-  donut: Donut,
-} as const
+/**
+ * A stack of fudge brownies. Dark crumb with a paler crackled top, since that
+ * split-sugar crust is the thing people actually look for.
+ */
+export function Brownie({ accent = 'grape' }: Props) {
+  const c = accentHex[accent]
+  const squares = [
+    { pos: [-0.05, -0.34, 0.05] as [number, number, number], rot: 0.06 },
+    { pos: [0.06, 0.02, -0.04] as [number, number, number], rot: -0.14 },
+    { pos: [-0.02, 0.38, 0.03] as [number, number, number], rot: 0.09 },
+  ]
 
-export type PropName = keyof typeof propMap
+  return (
+    <group rotation={[0, 0.5, 0]}>
+      {squares.map((s, i) => (
+        <group key={i} position={s.pos} rotation={[0, s.rot, 0]}>
+          {/* the fudgy body */}
+          <mesh castShadow receiveShadow>
+            <boxGeometry args={[1.25, 0.34, 1.25]} />
+            <meshStandardMaterial color="#3a2118" roughness={0.88} />
+          </mesh>
+          {/* crackled sugar crust, a shade lighter and slightly proud */}
+          <mesh position={[0, 0.18, 0]}>
+            <boxGeometry args={[1.22, 0.04, 1.22]} />
+            <meshStandardMaterial color="#6b4430" roughness={0.6} flatShading />
+          </mesh>
+        </group>
+      ))}
+
+      {/* a couple of chocolate chunks resting on top */}
+      <mesh position={[0.24, 0.62, 0.16]} rotation={[0.4, 0.6, 0.2]} castShadow>
+        <boxGeometry args={[0.22, 0.16, 0.22]} />
+        <meshStandardMaterial color="#24140e" roughness={0.5} />
+      </mesh>
+      <mesh position={[-0.28, 0.6, -0.14]} rotation={[0.2, 1.1, 0.5]} castShadow>
+        <boxGeometry args={[0.18, 0.14, 0.18]} />
+        <meshStandardMaterial color="#24140e" roughness={0.5} />
+      </mesh>
+
+      {/* the accent shows up as a thin drizzle rather than colouring the bake */}
+      <mesh position={[0, 0.58, 0]} rotation={[Math.PI / 2, 0, 0.3]}>
+        <torusGeometry args={[0.42, 0.028, 10, 32, Math.PI * 1.3]} />
+        <Glaze color={c} />
+      </mesh>
+    </group>
+  )
+}

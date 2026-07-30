@@ -1,16 +1,16 @@
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useRef } from 'react'
 import { Button, Highlight, WhatsAppIcon, ArrowIcon, cx } from '../components/ui'
-import { Cake } from '../three/Props'
+import { PhotoSlab, usePhotoTexture } from '../three/PhotoSlab'
 import { Sprinkles } from '../three/Sprinkles'
 import { Stage3D } from '../three/Stage'
 import { soft } from '../lib/motion'
-import { site, whatsappLink } from '../lib/site'
+import { heroCakes, site, whatsappLink } from '../lib/site'
 import { useIsDesktop } from '../lib/hooks'
 
-const headline = ['Every', 'celebration', 'deserves', 'a']
+const headline = ['A', 'cake', 'they', 'talk', 'about']
 
-/** Small die-cut badges that hover around the cake. */
+/** Small die-cut badges that hover around the cakes. */
 function FloatingBadge({
   children,
   className,
@@ -40,6 +40,61 @@ function FloatingBadge({
   )
 }
 
+/**
+ * The hero stage: her actual cakes, rendered as lit prints floating in real
+ * perspective. The big one leads, two more hang back and catch the parallax.
+ */
+function CakeStack({ compact }: { compact: boolean }) {
+  const [lead, second, third] = heroCakes
+  const leadTex = usePhotoTexture(lead.image)
+  const secondTex = usePhotoTexture(second.image)
+  const thirdTex = usePhotoTexture(third.image)
+
+  return (
+    <Stage3D
+      className="absolute inset-0"
+      distance={compact ? 8.4 : 7.6}
+      elevation={5}
+      tilt={compact ? 0.5 : 1.15}
+      spin={0}
+      floatIntensity={0.4}
+      shadow="none"
+    >
+      {leadTex && (
+        <group position={[0, 0.05, 0]}>
+          <PhotoSlab texture={leadTex} maxWidth={2.9} maxHeight={3.5} accent={lead.accent} />
+        </group>
+      )}
+
+      {!compact && secondTex && (
+        <group position={[-1.95, 0.55, -1.6]} rotation={[0, 0.46, 0.04]}>
+          <PhotoSlab
+            texture={secondTex}
+            maxWidth={1.6}
+            maxHeight={2.0}
+            accent={second.accent}
+            drift={false}
+          />
+        </group>
+      )}
+
+      {!compact && thirdTex && (
+        <group position={[2.0, -0.4, -1.8]} rotation={[0, -0.48, -0.05]}>
+          <PhotoSlab
+            texture={thirdTex}
+            maxWidth={1.55}
+            maxHeight={1.95}
+            accent={third.accent}
+            drift={false}
+          />
+        </group>
+      )}
+
+      <Sprinkles count={compact ? 45 : 95} spread={[4.4, 3, 2.2]} />
+    </Stage3D>
+  )
+}
+
 export function Hero() {
   const ref = useRef<HTMLDivElement>(null)
   const isDesktop = useIsDesktop()
@@ -49,15 +104,13 @@ export function Hero() {
 
   return (
     <div ref={ref} id="top" className="relative min-h-[100svh] overflow-hidden pt-28 pb-16 sm:pt-32 lg:pt-36">
-      {/* soft blobs behind everything */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
         <div className="absolute -top-24 -left-20 h-[26rem] w-[26rem] rounded-full bg-berry/20 blur-3xl" />
         <div className="absolute top-1/3 -right-24 h-[30rem] w-[30rem] rounded-full bg-mint/20 blur-3xl" />
         <div className="absolute bottom-0 left-1/3 h-[22rem] w-[22rem] rounded-full bg-butter/20 blur-3xl" />
       </div>
 
-      <div className="mx-auto grid w-full max-w-6xl items-center gap-10 px-5 sm:px-8 lg:grid-cols-[1.05fr_1fr] lg:gap-6">
-        {/* ---------------------------------------------------------------- */}
+      <div className="mx-auto grid w-full max-w-6xl items-center gap-10 px-5 sm:px-8 lg:grid-cols-[1fr_1.05fr] lg:gap-6">
         <motion.div style={{ y: textY, opacity: fade }} className="relative z-20 max-w-xl">
           <motion.span
             initial={{ opacity: 0, y: 14 }}
@@ -69,10 +122,10 @@ export function Hero() {
               <span className="absolute inline-flex h-full w-full animate-ping rounded-full bg-mint opacity-75" />
               <span className="relative inline-flex h-2 w-2 rounded-full bg-mint" />
             </span>
-            Home bakery · {site.city}
+            Custom cakes · {site.city}
           </motion.span>
 
-          <h1 className="mt-6 text-[2.75rem] leading-[0.98] font-semibold sm:text-6xl lg:text-[4.4rem]">
+          <h1 className="mt-6 text-[2.75rem] leading-[0.98] font-semibold sm:text-6xl lg:text-[4.2rem]">
             {headline.map((word, i) => (
               <motion.span
                 key={word}
@@ -81,17 +134,16 @@ export function Hero() {
                 transition={{ duration: 0.75, ease: soft, delay: 0.35 + i * 0.07 }}
                 className="mr-[0.25em] inline-block"
               >
-                {word}
+                {word === 'talk' ? <Highlight accent="butter">talk</Highlight> : word}
               </motion.span>
             ))}
             <motion.span
               initial={{ opacity: 0, y: 30 }}
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.75, ease: soft, delay: 0.35 + headline.length * 0.07 }}
-              className="inline-block"
+              className="inline-block font-hand text-[1.1em] text-berry"
             >
-              <Highlight accent="butter">sprinkle</Highlight>{' '}
-              <span className="font-hand text-[1.15em] text-berry">on top</span>
+              for years
             </motion.span>
           </h1>
 
@@ -101,9 +153,9 @@ export function Hero() {
             transition={{ duration: 0.7, ease: soft, delay: 0.75 }}
             className="mt-6 max-w-lg text-base text-ink-soft sm:text-lg"
           >
-            Cakes, cupcakes, Korean cream buns and cookies — baked to order in{' '}
-            {site.owner.split(' ')[0]}&rsquo;s home kitchen. Small batches, real butter,
-            no preservatives, and eggless whenever you ask.
+            Character cakes, tiered showstoppers and quiet floral ones — designed
+            around your theme and baked to order in {site.owner.split(' ')[0]}&rsquo;s home
+            kitchen. Real butter, no preservatives, eggless whenever you ask.
           </motion.p>
 
           <motion.div
@@ -114,10 +166,10 @@ export function Hero() {
           >
             <Button href={whatsappLink()} target="_blank" rel="noreferrer" size="lg">
               <WhatsAppIcon className="h-5 w-5" />
-              Order on WhatsApp
+              Order a cake
             </Button>
-            <Button href="#menu" variant="secondary" size="lg">
-              See the menu
+            <Button href="#gallery" variant="secondary" size="lg">
+              See her cakes
               <ArrowIcon />
             </Button>
           </motion.div>
@@ -136,49 +188,21 @@ export function Hero() {
           </motion.div>
         </motion.div>
 
-        {/* ---------------------------------------------------------------- */}
-        <div className="relative h-[22rem] sm:h-[26rem] lg:h-[34rem]">
-          {isDesktop ? (
-            <Stage3D
-              className="absolute inset-0"
-              distance={6.6}
-              elevation={12}
-              spin={0.22}
-              tilt={1.15}
-              shadow="contact"
-              floatIntensity={0.45}
-            >
-              <Cake accent="berry" />
-              <Sprinkles count={110} spread={[4.2, 2.8, 2.2]} />
-            </Stage3D>
-          ) : (
-            <Stage3D
-              className="absolute inset-0"
-              distance={7.2}
-              elevation={12}
-              spin={0.2}
-              tilt={0.5}
-              floatIntensity={0.4}
-              shadow="fake"
-            >
-              <Cake accent="berry" />
-              <Sprinkles count={45} spread={[3.4, 2.4, 1.8]} />
-            </Stage3D>
-          )}
+        <div className="relative h-[24rem] sm:h-[28rem] lg:h-[36rem]">
+          <CakeStack compact={!isDesktop} />
 
-          <FloatingBadge className="top-2 left-0 sm:top-6" delay={1.2}>
-            🎂 Custom themes
+          <FloatingBadge className="top-0 left-0 sm:top-4" delay={1.2}>
+            🎂 Any theme you like
           </FloatingBadge>
           <FloatingBadge className="top-1/3 right-0" delay={1.4} drift={16}>
             🥚 Eggless on request
           </FloatingBadge>
-          <FloatingBadge className="bottom-6 left-4 sm:bottom-10" delay={1.6} drift={10}>
+          <FloatingBadge className="bottom-4 left-2 sm:bottom-10" delay={1.6} drift={10}>
             🧈 Baked fresh today
           </FloatingBadge>
         </div>
       </div>
 
-      {/* scroll cue */}
       <motion.div
         style={{ opacity: fade }}
         className="pointer-events-none absolute inset-x-0 bottom-6 z-20 flex justify-center"
