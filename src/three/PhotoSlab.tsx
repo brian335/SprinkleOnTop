@@ -53,6 +53,49 @@ export function usePhotoTexture(src?: string) {
   return texture
 }
 
+/**
+ * Loads a whole set of photos in one effect, so callers never have to run a
+ * hook per image. Entries stay null until their file resolves.
+ */
+export function usePhotoTextures(srcs: string[]) {
+  const key = srcs.join('|')
+  const [textures, setTextures] = useState<(Texture | null)[]>(() => srcs.map(() => null))
+
+  useEffect(() => {
+    let live = true
+    const list = key ? key.split('|') : []
+    const loaded: (Texture | null)[] = list.map(() => null)
+    setTextures(loaded.slice())
+
+    const loader = new TextureLoader()
+    list.forEach((src, i) => {
+      loader.load(
+        src,
+        (t) => {
+          if (!live) {
+            t.dispose()
+            return
+          }
+          t.colorSpace = SRGBColorSpace
+          t.minFilter = LinearFilter
+          t.generateMipmaps = false
+          loaded[i] = t
+          setTextures(loaded.slice())
+        },
+        undefined,
+        () => {},
+      )
+    })
+
+    return () => {
+      live = false
+      loaded.forEach((t) => t?.dispose())
+    }
+  }, [key])
+
+  return textures
+}
+
 /** Reads the real pixel aspect so portrait cakes aren't squashed into 4:3. */
 function textureAspect(texture: Texture) {
   const img = texture.image as { width?: number; height?: number } | undefined

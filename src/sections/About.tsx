@@ -1,18 +1,17 @@
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { useRef } from 'react'
+import { Suspense, lazy, useRef } from 'react'
 import { Button, Eyebrow, Reveal, Squiggle, WhatsAppIcon, cx } from '../components/ui'
 import { Photo } from '../components/Photo'
-import { PhotoSlab, usePhotoTexture } from '../three/PhotoSlab'
-import { Stage3D } from '../three/Stage'
 import { useIsDesktop } from '../lib/hooks'
 import { cakeById, images, site, stats, whatsappLink } from '../lib/site'
+
+const PrintStage = lazy(() => import('../three/stages/PrintStage'))
 
 export function About() {
   const ref = useRef<HTMLDivElement>(null)
   const isDesktop = useIsDesktop()
   // a real cake propped against the frame, rather than a made-up one
   const sideCake = cakeById('carnation-cream')
-  const sideTexture = usePhotoTexture(sideCake.image)
   const { scrollYProgress } = useScroll({ target: ref, offset: ['start end', 'end start'] })
   const y = useTransform(scrollYProgress, [0, 1], [40, -40])
 
@@ -44,23 +43,13 @@ export function About() {
           />
 
           {/* a real cake propped against the corner of the frame */}
-          {sideTexture && (
-            <Stage3D
+          <Suspense fallback={null}>
+            <PrintStage
+              src={sideCake.image}
+              accent={sideCake.accent}
               className="pointer-events-none absolute -right-6 -bottom-16 z-10 h-52 w-44 sm:-right-16 sm:-bottom-20 sm:h-64 sm:w-56"
-              distance={5.6}
-              elevation={5}
-              spin={0}
-              tilt={0.7}
-              shadow="contact"
-            >
-              <PhotoSlab
-                texture={sideTexture}
-                maxWidth={2.4}
-                maxHeight={3}
-                accent={sideCake.accent}
-              />
-            </Stage3D>
-          )}
+            />
+          </Suspense>
 
           <motion.span
             initial={{ scale: 0, rotate: -20 }}
@@ -89,19 +78,19 @@ export function About() {
             <div className="flex max-w-xl flex-col gap-4 text-base text-ink-soft sm:text-lg">
               <p>
                 What started as birthday cakes for my own family turned into a kitchen that
-                runs most mornings of the week. I still bake everything myself, in batches
-                small enough that I can taste as I go.
+                runs most mornings of the week. I still bake every cake myself, in batches
+                small enough that I can taste as I go. Everything is eggless, always.
               </p>
               <p>
                 No premixes, no preservatives, and nothing sitting in a display case for
-                three days. If you order for Saturday, it comes out of the oven on Saturday
-                — and I&rsquo;ll tell you honestly if a design won&rsquo;t work before you pay for it.
+                three days. If you order for Saturday, it comes out of the oven on Saturday.
+                I&rsquo;ll also tell you honestly if a design will not work before you pay for it.
               </p>
             </div>
           </Reveal>
 
           <Reveal delay={0.18}>
-            <p className="font-hand text-3xl text-berry">— Ragini</p>
+            <p className="font-hand text-3xl text-berry">love, Ragini</p>
           </Reveal>
 
           <Reveal delay={0.22}>

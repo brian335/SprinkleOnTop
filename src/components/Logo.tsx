@@ -80,7 +80,7 @@ export function Wordmark({ className, compact = false }: { className?: string; c
 
 export function Logo({ className }: { className?: string }) {
   return (
-    <a href="#top" className={cx('group flex items-center gap-2.5', className)} aria-label="Sprinkle On Top — home">
+    <a href="#top" className={cx('group flex items-center gap-2.5', className)} aria-label="Sprinkle On Top, back to top">
       <LogoMark className="h-11 w-11 transition-transform duration-500 ease-[var(--ease-sprung)] group-hover:rotate-[-8deg] group-hover:scale-105" />
       <Wordmark />
     </a>

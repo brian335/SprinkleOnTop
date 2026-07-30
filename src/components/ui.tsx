@@ -167,7 +167,7 @@ export const StaggerItem = ({ children, className }: { children: ReactNode; clas
 
 export function Eyebrow({ children, accent = 'berry' }: { children: ReactNode; accent?: AccentName }) {
   return (
-    <span className="inline-flex items-center gap-2 rounded-full border-2 border-ink bg-paper px-4 py-1.5 text-xs font-bold tracking-[0.18em] uppercase sticker-sm">
+    <span className="inline-flex items-center gap-2 rounded-full border-2 border-ink bg-paper px-4 py-1.5 font-hand text-lg leading-none font-bold sticker-sm">
       <span className={cx('h-2 w-2 rounded-full', accentBg[accent])} />
       {children}
     </span>

@@ -2,9 +2,8 @@
 
 Website for **Sprinkle On Top**, the home bakery run by Ragini Saraf in Bengaluru.
 
-The home page is entirely about **cakes** — her real ones, photographed and then
-rendered as lit 3D prints rather than flat images. Everything else she bakes
-(Korean cream buns, cookies, brownies) lives on its own page at `/more`.
+One page, entirely about cakes. Her real ones, photographed, and shown both as a
+sliding 3D carousel in the hero and as a filterable gallery further down.
 
 ## Running it
 
@@ -16,95 +15,77 @@ npm run preview  # serve the built site
 ```
 
 `SINGLE_FILE=1 npm run build` emits one self-contained `dist/index.html` with
-every asset inlined — handy for sending someone a preview.
+every asset inlined, which is handy for sending someone a preview.
 
 ## Where things live
 
 ```
 src/
-  lib/site.ts         all copy, prices, links, FAQs — edit content here, not in JSX
-  lib/motion.ts       shared easing curves and reveal variants
-  lib/hooks.ts        smooth scroll, media queries, scroll state
-  index.css           design tokens (colour, type, the sticker motif)
+  lib/site.ts            all copy, links and image paths. Edit content here, not in JSX
+  lib/motion.ts          shared easing curves and reveal variants
+  lib/hooks.ts           smooth scroll, media queries, scroll state
+  index.css              design tokens: colour, type, the sticker motif
 
-  three/PhotoSlab.tsx a photo rendered as a lit, bowed physical print
-  three/Props.tsx     procedural stand-ins: cream bun, cookies, brownies
-  three/Sprinkles.tsx instanced sprinkle cloud
-  three/Stage.tsx     the shared canvas, lighting rig and per-section camera
+  three/CakeCarousel.tsx the hero row of cakes, sliding and steered by the cursor
+  three/PhotoSlab.tsx    a photo rendered as a lit, gently bowed physical print
+  three/Sprinkles.tsx    instanced sprinkle cloud
+  three/Stage.tsx        the shared canvas, lighting rig and per section camera
+  three/stages/          the lazily loaded 3D blocks each section mounts
 
-  components/         Button, Logo, Marquee, TiltCard and other primitives
-  sections/           one file per section of the page
+  components/            Button, Logo, Marquee, Photo and other primitives
+  sections/              one file per section of the page
 ```
 
-### Pages
+Sections in order: hero, trust ribbon, gallery, how it works, about, reviews,
+contact.
 
-| Route | What's on it |
-| --- | --- |
-| `/` | Hero · cake styles · gallery · signature rail · process · about · reviews · FAQ · contact |
-| `/more` | Korean cream buns, cookies and brownies |
+## Loading speed
 
-Routing is `react-router-dom` with a `BrowserRouter`, so **the host needs an SPA
-rewrite** (serve `index.html` for unknown paths) or `/more` will 404 on a hard
-refresh. Netlify: a `_redirects` file with `/* /index.html 200`. Vercel and
-Cloudflare Pages do this by default.
+Three.js is by far the heaviest dependency, so the whole 3D layer sits behind a
+dynamic import. The first paint ships about **124 kB gzipped**; the 3D chunk
+(~238 kB gzipped) arrives afterwards and swaps itself in. Until it does, the
+hero shows a real cake photo rather than an empty box, so nothing pops.
 
-### The 3D setup
+Photos are served at two sizes. The gallery and lightbox use `/photos` at 1000px
+wide; the 3D carousel uses `/photos/thumb` at 520px, which keeps GPU memory
+sane on phones. `thumbOf()` in `lib/site.ts` maps between them.
 
-Every 3D moment on the page draws into **one** WebGL canvas (`SharedCanvas` in
-`App.tsx`) using drei's `<View>`, which scissors a region per placement — so the
-hero, four style cards, six signature cards and the rest cost a single WebGL
-context rather than a dozen.
+## The 3D setup
+
+Every 3D moment draws into **one** WebGL canvas (`SharedCanvas`) using drei's
+`<View>`, which scissors a region per placement. The hero carousel is a single
+view holding all twelve cakes rather than one view per cake.
 
 `<Stage3D>` frames each subject with `distance` and `elevation` (degrees above
-the subject) rather than a raw camera position. Flat things — cookies, brownies —
-need a steep elevation or you end up looking at their edge; prints and cakes want
-a near-level eye line.
-
-The design language comes off the logo sticker: cream paper, near-black doodle
-ink, and the six candy accents from the drawn icons. Buttons, cards and chips all
-share one die-cut treatment (2px ink border, hard offset shadow) so the page
-reads as a sheet of stickers.
-
-## Images
-
-Every image on the site is optional at runtime. Drop a file at the expected path
-in `public/` and it appears; leave it missing and the component falls back to a
-placeholder. **No code changes are needed to add photography** — see
-[`public/README.md`](public/README.md) for the full list of filenames and sizes.
-
-### Cake photos are 3D objects, not `<img>` tags
-
-Everywhere a cake is *sold* — the hero, the style cards, the signature rail, the
-About corner, the contact panel — the photograph is loaded as a **WebGL texture**
-and rendered inside the shared canvas as a physical print: a thick cream-edged
-board, the image bowed slightly the way paper is, lit by the same lights as
-everything around it, floating over a contact shadow and pitching toward the
-cursor. `PhotoSlab` reads each image's real aspect ratio, so portrait and square
-cakes both sit correctly in their frame.
-
-The **gallery** deliberately uses plain `<img>` instead: twelve WebGL views would
-be wasteful, and there the job is seeing the cake clearly. Tiles get a CSS lift
-and a shared-element transition into the lightbox.
-
-`usePhotoTexture` loads without suspending, so a missing photo leaves the card in
-its fallback state rather than crashing it.
+the subject) rather than a raw camera position.
 
 One consequence worth knowing: **the canvas paints above the whole page**, so no
-DOM element can sit on top of a 3D print. That is why prices and badges live in
-the card body rather than over the image. Anything that must overlay a print has
-to be built into the 3D scene instead.
+DOM element can sit on top of a 3D print. Anything that must overlay one has to
+be built into the 3D scene instead.
+
+## House style for copy
+
+No em dashes and no en dashes anywhere in visible text, and hyphens only where a
+word genuinely needs one. Short sentences instead. The handwritten face
+(Caveat) carries eyebrows, filter chips and small asides; the serif carries
+headings; everything else is the sans.
+
+Prices are deliberately absent. Every enquiry goes to WhatsApp or a phone call.
 
 ## What still needs Ragini
 
-- **A photo of her** for the About section (`public/photos/ragini.jpg`, 4:5).
-- **Photos of the buns, cookies and brownies** — those three cards on `/more`
-  currently show procedural 3D stand-ins and say "photo coming soon".
-- **Prices** — everything in `lib/site.ts` is a placeholder pending her rate card.
-- **Testimonials and stats** — written as realistic examples; swap in real
-  reviews before this goes public.
+- **A photo of her** for the About section at `public/photos/ragini.jpg`, 4:5.
+- **Real reviews.** The five in `lib/site.ts` are realistic placeholders.
+- **The stats** (6+ years, 2,400+ cakes) are guesses. Correct them.
+- **Cake names** were written from the photographs. Rename freely in
+  `lib/site.ts`; the gallery and hero both read from that one list.
+
+To add a cake: drop the JPG into `public/photos`, a 520px copy into
+`public/photos/thumb`, and add an entry to `cakes`. It joins the gallery and the
+hero carousel automatically.
 
 ## Stack
 
 Vite · React · TypeScript · Tailwind CSS v4 · Three.js via react-three-fiber and
 drei · Framer Motion · Lenis. Fonts (Fraunces, Plus Jakarta Sans, Caveat) are
-self-hosted through Fontsource, so there is no external font request.
+self hosted through Fontsource, so there is no external font request.

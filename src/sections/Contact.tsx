@@ -1,22 +1,21 @@
 import { motion } from 'framer-motion'
+import { Suspense, lazy } from 'react'
 import { Button, InstagramIcon, Reveal, WhatsAppIcon } from '../components/ui'
-import { PhotoSlab, usePhotoTexture } from '../three/PhotoSlab'
-import { Sprinkles } from '../three/Sprinkles'
-import { Stage3D } from '../three/Stage'
 import { useIsDesktop } from '../lib/hooks'
 import { cakeById, site, whatsappLink } from '../lib/site'
+
+const PrintStage = lazy(() => import('../three/stages/PrintStage'))
 
 const details = [
   { label: 'WhatsApp & calls', value: site.phoneDisplay, href: `tel:${site.phone}` },
   { label: 'Instagram', value: site.instagramHandle, href: site.instagram },
   { label: 'Pickup', value: `Home kitchen, ${site.city}`, href: undefined },
-  { label: 'Notice', value: '48 hours for most orders', href: undefined },
+  { label: 'Notice', value: '48 hours for most cakes', href: undefined },
 ]
 
 export function Contact() {
   const isDesktop = useIsDesktop()
   const cake = cakeById('butterfly-pullup')
-  const texture = usePhotoTexture(cake.image)
 
   return (
     <section id="contact" className="px-4 pb-20 sm:px-8">
@@ -27,31 +26,25 @@ export function Contact() {
           <div className="absolute -right-16 bottom-0 h-80 w-80 rounded-full bg-mint/25 blur-3xl" />
         </div>
 
-        {isDesktop && texture && (
-          <Stage3D
-            className="pointer-events-none absolute top-8 right-4 h-[22rem] w-72 lg:h-[26rem] lg:w-80"
-            distance={6.4}
-            elevation={5}
-            spin={0}
-            tilt={0.9}
-            shadow="none"
-            lightIntensity={1.15}
-          >
-            <PhotoSlab texture={texture} maxWidth={2.6} maxHeight={3.4} accent={cake.accent} />
-            <Sprinkles count={38} spread={[2.8, 2.4, 1.4]} size={0.9} />
-          </Stage3D>
+        {isDesktop && (
+          <Suspense fallback={null}>
+            <PrintStage
+              src={cake.image}
+              accent={cake.accent}
+              className="pointer-events-none absolute top-8 right-4 h-[22rem] w-72 lg:h-[26rem] lg:w-80"
+              distance={6.4}
+              maxWidth={2.6}
+              maxHeight={3.4}
+              sprinkles={38}
+              lightIntensity={1.15}
+              shadow="none"
+            />
+          </Suspense>
         )}
 
         <div className="relative z-10 max-w-2xl">
           <Reveal>
-            <span className="inline-flex items-center gap-2 rounded-full border-2 border-cream/30 px-4 py-1.5 text-xs font-bold tracking-[0.18em] uppercase">
-              <span className="h-2 w-2 rounded-full bg-mint" />
-              Taking orders now
-            </span>
-          </Reveal>
-
-          <Reveal delay={0.06}>
-            <h2 className="mt-6 text-4xl leading-[1.02] font-semibold sm:text-5xl lg:text-6xl">
+            <h2 className="text-4xl leading-[1.02] font-semibold sm:text-5xl lg:text-6xl">
               Tell her what you&rsquo;re
               <br />
               celebrating
@@ -61,7 +54,7 @@ export function Contact() {
           <Reveal delay={0.12}>
             <p className="mt-5 max-w-lg text-base text-cream/70 sm:text-lg">
               Send the date, the occasion and roughly how many people. You&rsquo;ll get flavours,
-              sizes and a price back the same day — usually within a couple of hours.
+              sizes and a price back the same day, usually within a couple of hours.
             </p>
           </Reveal>
 

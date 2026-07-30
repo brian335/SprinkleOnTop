@@ -1,63 +1,14 @@
 import { AnimatePresence, motion } from 'framer-motion'
-import { useEffect, useState, type ReactNode } from 'react'
-import { Link, useLocation } from 'react-router-dom'
+import { useEffect, useState } from 'react'
 import { Logo } from '../components/Logo'
 import { Button, WhatsAppIcon, cx } from '../components/ui'
 import { useScrolled } from '../lib/hooks'
 import { nav, whatsappLink } from '../lib/site'
 import { soft } from '../lib/motion'
 
-/**
- * Section links are plain anchors while you are already on the home page, so
- * Lenis can animate the scroll. From any other page they become router links
- * carrying the hash, and App scrolls once the section has mounted.
- */
-function NavLink({
-  href,
-  route,
-  onNavigate,
-  className,
-  children,
-}: {
-  href: string
-  route?: boolean
-  onNavigate?: () => void
-  className?: string
-  children: ReactNode
-}) {
-  const { pathname } = useLocation()
-
-  if (route) {
-    return (
-      <Link to={href} onClick={onNavigate} className={className}>
-        {children}
-      </Link>
-    )
-  }
-
-  const hash = href.slice(href.indexOf('#'))
-
-  if (pathname === '/') {
-    return (
-      <a href={hash} onClick={onNavigate} className={className}>
-        {children}
-      </a>
-    )
-  }
-
-  return (
-    <Link to={href} onClick={onNavigate} className={className}>
-      {children}
-    </Link>
-  )
-}
-
 export function Nav() {
   const scrolled = useScrolled(30)
   const [open, setOpen] = useState(false)
-  const { pathname } = useLocation()
-
-  useEffect(() => setOpen(false), [pathname])
 
   useEffect(() => {
     document.body.style.overflow = open ? 'hidden' : ''
@@ -85,33 +36,21 @@ export function Nav() {
           <Logo />
 
           <nav className="hidden items-center gap-1 lg:flex">
-            {nav.map((item) => {
-              const active = item.route && pathname === item.href
-              return (
-                <NavLink
-                  key={item.href}
-                  href={item.href}
-                  route={item.route}
-                  className={cx(
-                    'group relative rounded-full px-4 py-2 text-sm font-semibold transition-colors',
-                    active ? 'text-ink' : 'text-ink-soft hover:text-ink',
-                  )}
-                >
-                  <span className="relative z-10">{item.label}</span>
-                  <span
-                    className={cx(
-                      'absolute inset-x-3 bottom-1.5 h-[3px] origin-left rounded-full bg-berry transition-transform duration-300 ease-[var(--ease-soft)] group-hover:scale-x-100',
-                      active ? 'scale-x-100' : 'scale-x-0',
-                    )}
-                  />
-                </NavLink>
-              )
-            })}
+            {nav.map((item) => (
+              <a
+                key={item.href}
+                href={item.href}
+                className="group relative rounded-full px-4 py-2 text-sm font-semibold text-ink-soft transition-colors hover:text-ink"
+              >
+                <span className="relative z-10">{item.label}</span>
+                <span className="absolute inset-x-3 bottom-1.5 h-[3px] origin-left scale-x-0 rounded-full bg-berry transition-transform duration-300 ease-[var(--ease-soft)] group-hover:scale-x-100" />
+              </a>
+            ))}
           </nav>
 
           <div className="flex items-center gap-2">
-            {/* wrapper does the hiding — a display utility on Button itself
-                loses to the `inline-flex` in its own base classes */}
+            {/* wrapper does the hiding, since a display utility on Button
+                itself loses to the inline-flex in its own base classes */}
             <span className="hidden sm:block">
               <Button href={whatsappLink()} target="_blank" rel="noreferrer">
                 <WhatsAppIcon />
@@ -160,19 +99,15 @@ export function Nav() {
               variants={{ show: { transition: { staggerChildren: 0.06, delayChildren: 0.1 } } }}
             >
               {nav.map((item) => (
-                <motion.div
+                <motion.a
                   key={item.href}
+                  href={item.href}
+                  onClick={() => setOpen(false)}
                   variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}
+                  className="font-display text-4xl font-semibold tracking-tight sm:text-5xl"
                 >
-                  <NavLink
-                    href={item.href}
-                    route={item.route}
-                    onNavigate={() => setOpen(false)}
-                    className="font-display text-4xl font-semibold tracking-tight sm:text-5xl"
-                  >
-                    {item.label}
-                  </NavLink>
-                </motion.div>
+                  {item.label}
+                </motion.a>
               ))}
               <motion.div
                 variants={{ hidden: { opacity: 0, y: 20 }, show: { opacity: 1, y: 0 } }}

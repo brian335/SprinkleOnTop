@@ -54,10 +54,13 @@
     font-family: var(--font-sans);
     font-synthesis-weight: none;
     overflow-x: hidden;
-    /* faint sugar-glaze wash so the cream never reads as flat paper */
+    /* sugar-glaze wash: pink, mint and butter bleeding into the cream so the
+       page reads warm and hand-made rather than flat white */
     background-image:
-      radial-gradient(60rem 40rem at 12% -12%, #ffe6f2 0%, transparent 60%),
-      radial-gradient(50rem 40rem at 96% 4%, #e4fbf4 0%, transparent 55%);
+      radial-gradient(58rem 42rem at 8% -10%, #ffe1ef 0%, transparent 60%),
+      radial-gradient(52rem 40rem at 98% 2%, #d8faf0 0%, transparent 56%),
+      radial-gradient(46rem 38rem at 64% 16%, #fff3cd 0%, transparent 54%),
+      radial-gradient(40rem 34rem at 18% 84%, #ffe9db 0%, transparent 52%);
     background-attachment: fixed;
   }
 
