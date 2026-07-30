@@ -59,11 +59,27 @@ in `public/` and it appears; leave it missing and the component falls back to a
 placeholder. **No code changes are needed to add photography** — see
 [`public/README.md`](public/README.md) for the full list of filenames and sizes.
 
-The `Photo` component holds the placeholder underneath until the real file has
-actually decoded, so a missing or slow image never leaves a blank hole. Menu
-cards go one step further: when a real photo exists the 3D prop shrinks to a
-small corner accent and lets the photo carry the card; when it doesn't, the prop
-stays centred and large.
+### Photos are 3D objects, not `<img>` tags
+
+On the menu and bestseller cards the photograph is loaded as a **WebGL texture**
+and rendered inside the shared canvas as a physical print: a thick cream-edged
+board, the image bowed very slightly the way paper is, lit by the same lights as
+the cakes around it, floating over its own contact shadow and pitching toward
+the cursor. On menu cards the procedural bake then steps out *in front of* its
+own photograph.
+
+`three/PhotoSlab.tsx` holds that treatment, and `usePhotoTexture` loads the file
+without suspending — a missing photo simply leaves the card in its 3D-prop-only
+state rather than crashing it.
+
+One consequence worth knowing: **the canvas paints above the whole page**, so no
+DOM element can sit on top of a photo. That is why prices and badges live in the
+card body rather than over the image. Anything that must overlay a photo has to
+be built into the 3D scene instead.
+
+Elsewhere — the About portrait — photos use the plain `Photo` component, which
+holds a placeholder underneath until the real file has decoded so a missing or
+slow image never leaves a blank hole.
 
 ## What still needs Ragini
 

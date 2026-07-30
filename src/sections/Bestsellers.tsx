@@ -1,30 +1,56 @@
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useLayoutEffect, useRef, useState } from 'react'
-import { Button, Eyebrow, Reveal, WhatsAppIcon } from '../components/ui'
+import { Button, Eyebrow, Reveal, WhatsAppIcon, accentBg, cx } from '../components/ui'
 import { Photo } from '../components/Photo'
+import { PhotoSlab, usePhotoTexture } from '../three/PhotoSlab'
+import { Stage3D } from '../three/Stage'
 import { useIsDesktop } from '../lib/hooks'
 import { bestsellers, whatsappLink, type Bestseller } from '../lib/site'
 
-function PhotoSlot({ item }: { item: Bestseller }) {
+/**
+ * The photo renders as a lit 3D print inside the shared canvas. The DOM layer
+ * below is only the coloured stage it floats on, plus the badge.
+ */
+function PhotoSlot({ item, live }: { item: Bestseller; live: boolean }) {
+  const texture = usePhotoTexture(item.image)
+
   return (
-    <Photo
-      src={item.image}
-      alt={item.alt}
-      accent={item.accent}
-      fallbackLabel={item.name.charAt(0)}
-      className="aspect-[4/3] border-b-2 border-ink"
-      imgClassName="transition-transform duration-700 ease-[var(--ease-soft)] group-hover:scale-[1.06]"
-    >
-      {item.badge && (
-        <span className="absolute top-3 left-3 rounded-full border-2 border-ink bg-paper px-3 py-1 text-[0.7rem] font-extrabold tracking-wide uppercase">
-          {item.badge}
-        </span>
+    <div className="relative">
+      {live && texture && (
+        <Stage3D
+          className="pointer-events-none absolute inset-0 z-10"
+          distance={5.1}
+          elevation={6}
+          tilt={0.8}
+          spin={0}
+          floatIntensity={0.3}
+          shadow="contact"
+        >
+          <PhotoSlab texture={texture} width={3.2} accent={item.accent} />
+        </Stage3D>
       )}
-    </Photo>
+
+      <Photo
+        src={undefined}
+        alt={item.alt}
+        accent={item.accent}
+        fallbackLabel={texture ? undefined : item.name.charAt(0)}
+        className="aspect-[4/3] border-b-2 border-ink"
+        placeholder={
+          <>
+            <div className="absolute inset-0 opacity-45 [background:radial-gradient(circle_at_50%_120%,#fff_0%,transparent_60%)]" />
+            <div
+              aria-hidden
+              className="absolute inset-0 opacity-[0.14] [background-image:radial-gradient(var(--color-ink)_1.5px,transparent_1.5px)] [background-size:14px_14px]"
+            />
+          </>
+        }
+      />
+    </div>
   )
 }
 
-function Card({ item }: { item: Bestseller }) {
+function Card({ item, live = true }: { item: Bestseller; live?: boolean }) {
   return (
     <a
       href={whatsappLink(`Hi Ragini! I'd like to order the ${item.name}.`)}
@@ -32,17 +58,31 @@ function Card({ item }: { item: Bestseller }) {
       rel="noreferrer"
       className="group flex w-[19rem] shrink-0 flex-col overflow-hidden rounded-[1.75rem] border-2 border-ink bg-paper shadow-[6px_6px_0_var(--color-ink)] transition-all duration-300 ease-[var(--ease-sprung)] hover:-translate-y-1.5 hover:shadow-[10px_12px_0_var(--color-ink)] sm:w-[22rem]"
     >
-      <PhotoSlot item={item} />
+      <PhotoSlot item={item} live={live} />
       <div className="flex flex-1 flex-col gap-2 p-5">
         <div className="flex items-baseline justify-between gap-3">
           <h3 className="text-xl font-semibold">{item.name}</h3>
           <span className="font-display text-lg font-extrabold whitespace-nowrap">{item.price}</span>
         </div>
         <p className="text-sm text-ink-soft">{item.note}</p>
-        <span className="mt-3 inline-flex w-fit items-center gap-1.5 rounded-full border-2 border-ink bg-ink px-4 py-1.5 text-xs font-bold text-cream transition-transform duration-300 group-hover:-translate-y-0.5">
-          <WhatsAppIcon className="h-3.5 w-3.5" />
-          Order this
-        </span>
+        {/* the badge rides this row rather than the photo — the 3D canvas
+            paints above the card, so nothing can overlay the print */}
+        <div className="mt-3 flex items-center justify-between gap-3">
+          <span className="inline-flex w-fit items-center gap-1.5 rounded-full border-2 border-ink bg-ink px-4 py-1.5 text-xs font-bold text-cream transition-transform duration-300 group-hover:-translate-y-0.5">
+            <WhatsAppIcon className="h-3.5 w-3.5" />
+            Order this
+          </span>
+          {item.badge && (
+            <span
+              className={cx(
+                'rounded-full border-2 border-ink px-2.5 py-1 text-[0.65rem] font-extrabold tracking-wide uppercase',
+                accentBg[item.accent],
+              )}
+            >
+              {item.badge}
+            </span>
+          )}
+        </div>
       </div>
     </a>
   )

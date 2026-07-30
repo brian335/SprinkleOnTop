@@ -45,8 +45,15 @@ Shot on a phone is fine — good daylight matters far more than the camera.
   page down.
 - JPG for photos, PNG only where transparency is needed.
 
-### When a menu photo exists
+### How these photos are rendered
 
-The 3D prop on that card shrinks and moves to the top-left corner as a small
-floating accent, letting the real bake carry the card. Cards without a photo
-keep the large centred 3D prop.
+Menu and bestseller photos are not `<img>` tags. Each one is loaded as a WebGL
+texture and rendered as a physical print inside the 3D scene — thick cream
+border, slightly bowed, lit and shadowed like the cakes around it, tilting with
+the cursor. On menu cards the 3D bake then steps out in front of its own photo.
+
+Two things follow from that:
+
+- **Leave breathing room around the bake.** The print is bowed and tilts, so a
+  subject cropped tight to the edge gets distorted at the corners.
+- A card with no photo simply shows its large centred 3D prop instead.
