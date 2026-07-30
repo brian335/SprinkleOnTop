@@ -1,0 +1,130 @@
+@import 'tailwindcss';
+
+@import '@fontsource-variable/fraunces';
+@import '@fontsource-variable/plus-jakarta-sans';
+@import '@fontsource-variable/caveat';
+
+/* ---------------------------------------------------------------------------
+   Sprinkle On Top — design tokens
+
+   The whole palette is pulled off the logo sticker: cream paper, near-black
+   doodle ink, and the six candy accents used in the drawn icons.
+--------------------------------------------------------------------------- */
+@theme {
+  /* surfaces */
+  --color-cream: #fff6ec;
+  --color-cream-deep: #fbe8d6;
+  --color-paper: #fffdf9;
+  --color-cocoa: #2a1d16;
+
+  /* ink */
+  --color-ink: #16121e;
+  --color-ink-soft: #6b6076;
+  --color-ink-faint: #a79fb0;
+
+  /* candy accents (logo doodles) */
+  --color-berry: #ff4e9b;
+  --color-butter: #ffc93c;
+  --color-mint: #37d9b4;
+  --color-grape: #8b5cf6;
+  --color-tangerine: #ff7a3d;
+  --color-sky: #4cc3ff;
+
+  --font-display: 'Fraunces Variable', Georgia, serif;
+  --font-sans: 'Plus Jakarta Sans Variable', ui-sans-serif, system-ui, sans-serif;
+  --font-hand: 'Caveat Variable', cursive;
+
+  --radius-blob: 2.5rem;
+
+  --ease-sprung: cubic-bezier(0.34, 1.56, 0.64, 1);
+  --ease-soft: cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+@layer base {
+  html {
+    -webkit-tap-highlight-color: transparent;
+    /* `clip` rather than `hidden` so it never turns into a scroll container
+       and breaks the sticky sections */
+    overflow-x: clip;
+  }
+
+  body {
+    background-color: var(--color-cream);
+    color: var(--color-ink);
+    font-family: var(--font-sans);
+    font-synthesis-weight: none;
+    overflow-x: hidden;
+    /* faint sugar-glaze wash so the cream never reads as flat paper */
+    background-image:
+      radial-gradient(60rem 40rem at 12% -12%, #ffe6f2 0%, transparent 60%),
+      radial-gradient(50rem 40rem at 96% 4%, #e4fbf4 0%, transparent 55%);
+    background-attachment: fixed;
+  }
+
+  ::selection {
+    background: var(--color-butter);
+    color: var(--color-ink);
+  }
+
+  h1,
+  h2,
+  h3 {
+    font-family: var(--font-display);
+    font-optical-sizing: auto;
+    font-variation-settings: 'SOFT' 40, 'WONK' 1;
+    letter-spacing: -0.025em;
+    text-wrap: balance;
+  }
+
+  p {
+    text-wrap: pretty;
+  }
+
+  :focus-visible {
+    outline: 3px solid var(--color-grape);
+    outline-offset: 3px;
+    border-radius: 6px;
+  }
+}
+
+@layer components {
+  /* Sticker treatment: hard offset ink edge, like a die-cut label.
+     Single motif tying buttons, cards and chips to the logo. */
+  .sticker {
+    border: 2px solid var(--color-ink);
+    box-shadow: 5px 5px 0 var(--color-ink);
+  }
+
+  .sticker-sm {
+    border: 2px solid var(--color-ink);
+    box-shadow: 3px 3px 0 var(--color-ink);
+  }
+
+  .glass {
+    background: color-mix(in srgb, var(--color-paper) 72%, transparent);
+    backdrop-filter: blur(14px) saturate(1.4);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.001ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.001ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+::-webkit-scrollbar {
+  width: 10px;
+}
+::-webkit-scrollbar-track {
+  background: var(--color-cream-deep);
+}
+::-webkit-scrollbar-thumb {
+  background: var(--color-berry);
+  border-radius: 99px;
+  border: 2px solid var(--color-cream-deep);
+}
