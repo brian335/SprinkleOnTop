@@ -9,7 +9,7 @@ import {
   cx,
 } from '../components/ui'
 import { soft } from '../lib/motion'
-import { cakeTagLabels, cakes, whatsappLink, type Cake, type CakeTag } from '../lib/site'
+import { cakeTagLabels, cakes, thumbOf, whatsappLink, type Cake, type CakeTag } from '../lib/site'
 
 type Filter = 'all' | CakeTag
 
@@ -36,7 +36,7 @@ function Tile({ cake, onOpen }: { cake: Cake; onOpen: () => void }) {
     >
       <motion.img
         layoutId={`cake-img-${cake.id}`}
-        src={cake.image}
+        src={thumbOf(cake.image)}
         alt={cake.alt}
         loading="lazy"
         decoding="async"

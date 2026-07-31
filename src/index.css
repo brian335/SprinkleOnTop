@@ -43,9 +43,20 @@
 @layer base {
   html {
     -webkit-tap-highlight-color: transparent;
-    /* Deliberately no overflow-x here: any value other than `visible` — `clip`
-       included — stops `position: sticky` working in the sections below.
-       Sideways overflow is contained at the element that causes it instead. */
+    /* Native smooth scrolling for the nav anchors. A JS smoothing library was
+       doing this before, at the cost of a rAF loop every frame and a little
+       input lag on every scroll.
+
+       Deliberately no overflow-x here: any value other than visible, clip
+       included, stops position sticky working in the sections below. Sideways
+       overflow is contained at the element that causes it instead. */
+    scroll-behavior: smooth;
+  }
+
+  /* keep anchored sections clear of the fixed header */
+  section[id],
+  div[id] {
+    scroll-margin-top: 6rem;
   }
 
   body {

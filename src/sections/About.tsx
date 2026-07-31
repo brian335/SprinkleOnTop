@@ -1,11 +1,9 @@
 import { motion, useScroll, useTransform } from 'framer-motion'
-import { Suspense, lazy, useRef } from 'react'
+import { useRef } from 'react'
 import { Button, Eyebrow, Reveal, Squiggle, WhatsAppIcon, cx } from '../components/ui'
 import { Photo } from '../components/Photo'
 import { useIsDesktop } from '../lib/hooks'
-import { cakeById, images, site, stats, whatsappLink } from '../lib/site'
-
-const PrintStage = lazy(() => import('../three/stages/PrintStage'))
+import { cakeById, images, site, stats, thumbOf, whatsappLink } from '../lib/site'
 
 export function About() {
   const ref = useRef<HTMLDivElement>(null)
@@ -43,13 +41,15 @@ export function About() {
           />
 
           {/* a real cake propped against the corner of the frame */}
-          <Suspense fallback={null}>
-            <PrintStage
-              src={sideCake.image}
-              accent={sideCake.accent}
-              className="pointer-events-none absolute -right-6 -bottom-16 z-10 h-52 w-44 sm:-right-16 sm:-bottom-20 sm:h-64 sm:w-56"
-            />
-          </Suspense>
+          <motion.img
+            src={thumbOf(sideCake.image)}
+            alt={sideCake.alt}
+            loading="lazy"
+            decoding="async"
+            animate={{ y: [0, -10, 0], rotate: [4, 6.5, 4] }}
+            transition={{ duration: 7, repeat: Infinity, ease: 'easeInOut' }}
+            className="pointer-events-none absolute -right-5 -bottom-14 z-10 w-32 rounded-2xl border-2 border-ink bg-paper p-1.5 shadow-[7px_8px_0_var(--color-ink)] sm:-right-14 sm:-bottom-16 sm:w-44"
+          />
 
           <motion.span
             initial={{ scale: 0, rotate: -20 }}

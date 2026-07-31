@@ -15,16 +15,14 @@ function rng(seed: number) {
 
 type Bit = {
   left: number
-  size: number
-  length: number
-  round: boolean
+  width: number
+  height: number
   color: string
-  fall: number
+  duration: number
   delay: number
-  sway: number
-  spin: number
   opacity: number
-  blur: number
+  /** which of the four drift paths this one takes */
+  path: number
 }
 
 function build(count: number, seed: number, big: boolean): Bit[] {
@@ -32,34 +30,30 @@ function build(count: number, seed: number, big: boolean): Bit[] {
   return Array.from({ length: count }, () => {
     const round = rand() > 0.72
     const scale = big ? 1.5 : 1
-    const size = (round ? 5 + rand() * 3 : 3.5 + rand() * 2) * scale
+    const w = (round ? 5 + rand() * 3 : 3.5 + rand() * 2) * scale
     return {
       left: rand() * 100,
-      size,
-      length: round ? size : size * (2.4 + rand() * 1.4),
-      round,
+      width: w,
+      height: round ? w : w * (2.4 + rand() * 1.4),
       color: palette[Math.floor(rand() * palette.length)],
-      // slower for the big ones in front, so the field reads as depth
-      fall: (big ? 15 : 11) + rand() * 9,
+      duration: (big ? 15 : 11) + rand() * 9,
       delay: -rand() * 26,
-      sway: 4 + rand() * 5,
-      spin: 3 + rand() * 6,
-      opacity: big ? 0.75 + rand() * 0.25 : 0.45 + rand() * 0.4,
-      blur: big && rand() > 0.6 ? 1.2 : 0,
+      opacity: big ? 0.8 : 0.5 + rand() * 0.35,
+      path: Math.floor(rand() * 4),
     }
   })
 }
 
 /**
- * Sprinkles falling through the section, which is only fair given the name.
+ * Sprinkles falling through the section, which the name rather demands.
  *
- * Pure CSS keyframes on transform and opacity, so the browser can run the whole
- * field on the compositor and it costs nothing on the main thread. Two layers
- * are used in the hero: a fine one behind the content and a few larger, slower
- * ones in front, which is what gives the section depth.
+ * One element per sprinkle, one animation each. Fall, drift and tumble are all
+ * baked into a single keyframe track rather than nested on three elements,
+ * because every animated element is a compositor layer and layers are the thing
+ * that actually costs on a phone.
  */
 export function SprinkleField({
-  count = 26,
+  count = 22,
   seed = 7,
   layer = 'back',
   className,
@@ -80,47 +74,54 @@ export function SprinkleField({
       {bits.map((b, i) => (
         <span
           key={i}
-          className="absolute top-0 will-change-transform"
+          className="sot-sprinkle absolute top-0 block"
           style={{
             left: `${b.left}%`,
-            animation: `sot-sprinkle-fall ${b.fall}s linear ${b.delay}s infinite`,
+            width: `${b.width}px`,
+            height: `${b.height}px`,
+            borderRadius: '99px',
+            background: b.color,
+            opacity: b.opacity,
+            animationName: `sot-sprinkle-${b.path}`,
+            animationDuration: `${b.duration}s`,
+            animationDelay: `${b.delay}s`,
           }}
-        >
-          <span
-            className="block will-change-transform"
-            style={{ animation: `sot-sprinkle-sway ${b.sway}s ease-in-out ${b.delay}s infinite` }}
-          >
-            <span
-              className="block"
-              style={{
-                width: `${b.size}px`,
-                height: `${b.length}px`,
-                borderRadius: '99px',
-                background: b.color,
-                opacity: b.opacity,
-                filter: b.blur ? `blur(${b.blur}px)` : undefined,
-                animation: `sot-sprinkle-spin ${b.spin}s linear ${b.delay}s infinite`,
-              }}
-            />
-          </span>
-        </span>
+        />
       ))}
 
       <style>{`
-        @keyframes sot-sprinkle-fall {
-          0%   { transform: translate3d(0, -15vh, 0); }
-          100% { transform: translate3d(0, 115vh, 0); }
+        .sot-sprinkle {
+          animation-timing-function: linear;
+          animation-iteration-count: infinite;
         }
-        @keyframes sot-sprinkle-sway {
-          0%, 100% { transform: translate3d(-13px, 0, 0); }
-          50%      { transform: translate3d(13px, 0, 0); }
+        /* Four hand written paths. Fall, sway and tumble live in one track so a
+           sprinkle is a single element and a single layer. */
+        @keyframes sot-sprinkle-0 {
+          0%   { transform: translate3d(-12px, -15vh, 0) rotate(0deg); }
+          25%  { transform: translate3d(10px, 17vh, 0) rotate(140deg); }
+          50%  { transform: translate3d(-8px, 48vh, 0) rotate(280deg); }
+          75%  { transform: translate3d(12px, 80vh, 0) rotate(430deg); }
+          100% { transform: translate3d(-6px, 115vh, 0) rotate(560deg); }
         }
-        @keyframes sot-sprinkle-spin {
-          from { transform: rotate(0deg); }
-          to   { transform: rotate(360deg); }
+        @keyframes sot-sprinkle-1 {
+          0%   { transform: translate3d(9px, -15vh, 0) rotate(40deg); }
+          30%  { transform: translate3d(-11px, 24vh, 0) rotate(-90deg); }
+          60%  { transform: translate3d(7px, 60vh, 0) rotate(-230deg); }
+          100% { transform: translate3d(-9px, 115vh, 0) rotate(-420deg); }
+        }
+        @keyframes sot-sprinkle-2 {
+          0%   { transform: translate3d(0, -15vh, 0) rotate(0deg); }
+          40%  { transform: translate3d(14px, 33vh, 0) rotate(200deg); }
+          80%  { transform: translate3d(-13px, 86vh, 0) rotate(390deg); }
+          100% { transform: translate3d(-4px, 115vh, 0) rotate(480deg); }
+        }
+        @keyframes sot-sprinkle-3 {
+          0%   { transform: translate3d(6px, -15vh, 0) rotate(-20deg); }
+          50%  { transform: translate3d(-10px, 45vh, 0) rotate(-180deg); }
+          100% { transform: translate3d(8px, 115vh, 0) rotate(-380deg); }
         }
         @media (prefers-reduced-motion: reduce) {
-          [style*="sot-sprinkle"] { animation: none !important; }
+          .sot-sprinkle { animation: none !important; opacity: 0 !important; }
         }
       `}</style>
     </div>

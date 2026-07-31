@@ -2,18 +2,21 @@
 
 ## brand/
 
-`logo.png` is the real sticker artwork. In place.
+`logo.webp` is the real sticker artwork, scaled to what the header renders at.
 
 ## photos/
 
-Twelve of Ragini's cakes, all in place. They drive the hero carousel and the
-gallery.
+Twelve of Ragini's cakes. They drive the hero deck and the gallery.
 
-Two sizes are kept:
+Two sizes, both WebP:
 
-- `photos/*.jpg` at 1000px wide, used by the gallery and the lightbox.
-- `photos/thumb/*.jpg` at 520px wide, used as textures by the 3D carousel.
-  Same filenames. `thumbOf()` in `src/lib/site.ts` maps between them.
+- `photos/*.webp` at 1000px wide, used only by the gallery lightbox.
+- `photos/thumb/*.webp` at 560px wide, used by the hero deck, the gallery tiles
+  and the small accents in About and Contact. Same filenames.
+  `thumbOf()` in `src/lib/site.ts` maps between them.
+
+Most of the page reads the thumb. Only the lightbox, where someone is
+deliberately looking closely, loads the full version.
 
 Adding a cake means dropping both sizes in and adding an entry to `cakes` in
 `src/lib/site.ts`.
@@ -21,12 +24,13 @@ Adding a cake means dropping both sizes in and adding an entry to `cakes` in
 ## Still missing
 
 `photos/ragini.jpg`, a 4:5 portrait for the About section. Until it exists that
-frame shows a placeholder.
+frame shows a placeholder. Save it as WebP if you can and update the path in
+`images.owner`.
 
 ## Sizes
 
-- 1000px on the long edge for the full version, 520px for the thumb.
-- Portrait or square both work. The 3D print reads the real aspect ratio and
-  fits itself to the frame.
-- Leave a little room around the cake. The print is gently bowed and tilts with
-  the cursor, so a subject cropped tight to the edge distorts at the corners.
+- 1000px on the long edge for the full version, 560px for the thumb.
+- WebP at quality 0.8. Converting the set from JPEG saved about a third of the
+  total weight at no visible cost.
+- Portrait or square both work.
+- Leave a little room around the cake. The deck crops to a fixed portrait shape.

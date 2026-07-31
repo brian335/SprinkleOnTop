@@ -4,7 +4,7 @@ import { CakeStack } from '../components/CakeStack'
 import { SprinkleField } from '../components/SprinkleField'
 import { Button, Highlight, WhatsAppIcon, ArrowIcon } from '../components/ui'
 import { soft } from '../lib/motion'
-import { accentHex, site, whatsappLink } from '../lib/site'
+import { accentHex, site, whatsappLink, type AccentName } from '../lib/site'
 
 const headline = ['A', 'cake', 'they', 'talk', 'about']
 
@@ -27,27 +27,36 @@ export function Hero() {
       className="relative flex min-h-[100svh] items-center overflow-hidden pt-24 pb-20 sm:pt-32 sm:pb-24"
     >
       {/* Ambient light that changes with the cake. A pink cake warms the whole
-          hero, a mint one cools it. */}
+          hero, a mint one cools it.
+
+          One soft gradient per colour, stacked, with only opacity animating.
+          Animating a colour on a blurred layer repaints the blur every frame,
+          which was the most expensive thing on the page; opacity on a static
+          layer is handled entirely by the compositor. */}
       <div aria-hidden className="pointer-events-none absolute inset-0 -z-10">
-        <motion.div
-          className="absolute top-[-18%] right-[-6%] h-[42rem] w-[42rem] rounded-full blur-[110px]"
-          animate={{ backgroundColor: accent }}
-          transition={{ duration: 1.4, ease: soft }}
-          style={{ opacity: 0.4 }}
-        />
-        <motion.div
-          className="absolute bottom-[-22%] left-[-10%] h-[34rem] w-[34rem] rounded-full blur-[110px]"
-          animate={{ backgroundColor: accent }}
-          transition={{ duration: 1.8, ease: soft }}
-          style={{ opacity: 0.22 }}
-        />
-        <div className="absolute top-1/4 left-1/3 h-[26rem] w-[26rem] rounded-full bg-butter/30 blur-[90px]" />
+        {(Object.keys(accentHex) as AccentName[]).map((name) => {
+          const on = accentHex[name] === accent
+          return (
+            <motion.div
+              key={name}
+              className="absolute inset-0"
+              initial={false}
+              animate={{ opacity: on ? 1 : 0 }}
+              transition={{ duration: 1.4, ease: soft }}
+              style={{
+                background: `radial-gradient(46rem 40rem at 92% -8%, ${accentHex[name]}66 0%, transparent 68%),
+                             radial-gradient(34rem 30rem at 4% 108%, ${accentHex[name]}3d 0%, transparent 66%)`,
+              }}
+            />
+          )
+        })}
+        <div className="absolute inset-0 [background:radial-gradient(28rem_26rem_at_36%_28%,#ffc93c4d_0%,transparent_65%)]" />
       </div>
 
       {/* sprinkles falling through the section, which is the least the name
           deserves. Fine ones behind the content, a few larger and slower in
           front, so the field reads as depth rather than a flat overlay. */}
-      <SprinkleField count={30} seed={11} layer="back" className="z-0" />
+      <SprinkleField count={22} seed={11} layer="back" className="z-0" />
 
       <div className="mx-auto grid w-full max-w-6xl items-center gap-9 px-5 sm:gap-12 sm:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10">
         <motion.div style={{ y: textY, opacity: fade }} className="relative z-20 max-w-xl">
@@ -143,7 +152,7 @@ export function Hero() {
         </motion.div>
       </div>
 
-      <SprinkleField count={8} seed={29} layer="front" className="z-30" />
+      <SprinkleField count={6} seed={29} layer="front" className="z-30" />
 
       <motion.div
         style={{ opacity: fade }}

@@ -1,6 +1,6 @@
 import { AnimatePresence, motion, type PanInfo } from 'framer-motion'
 import { useCallback, useEffect, useMemo, useState } from 'react'
-import { accentHex, cakes, type Cake } from '../lib/site'
+import { accentHex, cakes, thumbOf, type Cake } from '../lib/site'
 import { useHasHover, usePrefersReducedMotion } from '../lib/hooks'
 import { cx } from './ui'
 
@@ -64,9 +64,10 @@ function Card({
   // cards fan out behind the top one, each a little smaller and turned further
   const lean = [-3.5, 4.5, -6.5, 8][depth % 4]
 
-  // The whole deck keeps breathing between changes, so the section never sits
-  // completely still. Cards further back sway a touch wider and slower.
-  const sway = idle
+  // Only the front two cards breathe. The ones behind are barely visible, and
+  // every looping animation is main thread work that the deck does not need.
+  const breathes = idle && depth < 2
+  const sway = breathes
     ? {
         y: [depth * -16, depth * -16 - (7 + depth * 2), depth * -16],
         rotate: [lean, lean + (depth % 2 === 0 ? 1.4 : -1.4), lean],
@@ -93,10 +94,10 @@ function Card({
       }}
       transition={{
         default: { type: 'spring', stiffness: 210, damping: 26, mass: 0.9 },
-        y: idle
+        y: breathes
           ? { duration: 4.5 + depth * 0.6, repeat: Infinity, ease: 'easeInOut' }
           : { type: 'spring', stiffness: 210, damping: 26 },
-        rotate: idle
+        rotate: breathes
           ? { duration: 6 + depth * 0.8, repeat: Infinity, ease: 'easeInOut' }
           : { type: 'spring', stiffness: 210, damping: 26 },
       }}
@@ -114,7 +115,7 @@ function Card({
     >
       <div className="relative h-full w-full overflow-hidden rounded-[1.1rem] border-2 border-ink/80 bg-cream-deep">
         <img
-          src={cake.image}
+          src={thumbOf(cake.image)}
           alt={cake.alt}
           draggable={false}
           loading={depth === 0 ? 'eager' : 'lazy'}

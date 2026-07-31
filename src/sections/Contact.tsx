@@ -1,10 +1,7 @@
 import { motion } from 'framer-motion'
-import { Suspense, lazy } from 'react'
 import { Button, InstagramIcon, Reveal, WhatsAppIcon } from '../components/ui'
 import { useIsDesktop } from '../lib/hooks'
-import { cakeById, site, whatsappLink } from '../lib/site'
-
-const PrintStage = lazy(() => import('../three/stages/PrintStage'))
+import { cakeById, site, thumbOf, whatsappLink } from '../lib/site'
 
 const details = [
   { label: 'WhatsApp & calls', value: site.phoneDisplay, href: `tel:${site.phone}` },
@@ -27,19 +24,15 @@ export function Contact() {
         </div>
 
         {isDesktop && (
-          <Suspense fallback={null}>
-            <PrintStage
-              src={cake.image}
-              accent={cake.accent}
-              className="pointer-events-none absolute top-8 right-4 h-[22rem] w-72 lg:h-[26rem] lg:w-80"
-              distance={6.4}
-              maxWidth={2.6}
-              maxHeight={3.4}
-              sprinkles={38}
-              lightIntensity={1.15}
-              shadow="none"
-            />
-          </Suspense>
+          <motion.img
+            src={thumbOf(cake.image)}
+            alt={cake.alt}
+            loading="lazy"
+            decoding="async"
+            animate={{ y: [0, -14, 0], rotate: [-3, -1, -3] }}
+            transition={{ duration: 8, repeat: Infinity, ease: 'easeInOut' }}
+            className="pointer-events-none absolute top-10 right-8 w-56 rounded-2xl border-2 border-cream bg-cream p-2 shadow-[10px_12px_0_var(--color-berry)] lg:w-64"
+          />
         )}
 
         <div className="relative z-10 max-w-2xl">

@@ -23,15 +23,11 @@ every asset inlined, which is handy for sending someone a preview.
 src/
   lib/site.ts            all copy, links and image paths. Edit content here, not in JSX
   lib/motion.ts          shared easing curves and reveal variants
-  lib/hooks.ts           smooth scroll, media queries, scroll state
+  lib/hooks.ts           media queries, hover capability, scroll state
   index.css              design tokens: colour, type, the sticker motif
 
-  three/CakeCarousel.tsx the hero row of cakes, sliding and steered by the cursor
-  three/PhotoSlab.tsx    a photo rendered as a lit, gently bowed physical print
-  three/Sprinkles.tsx    instanced sprinkle cloud
-  three/Stage.tsx        the shared canvas, lighting rig and per section camera
-  three/stages/          the lazily loaded 3D blocks each section mounts
-
+  components/CakeStack.tsx    the hero deck: auto turning, draggable, breathing
+  components/SprinkleField.tsx falling sprinkles, one element and one animation each
   components/            Button, Logo, Marquee, Photo and other primitives
   sections/              one file per section of the page
 ```
@@ -39,29 +35,32 @@ src/
 Sections in order: hero, trust ribbon, gallery, how it works, about, reviews,
 contact.
 
-## Loading speed
+## Performance
 
-Three.js is by far the heaviest dependency, so the whole 3D layer sits behind a
-dynamic import. The first paint ships about **124 kB gzipped**; the 3D chunk
-(~238 kB gzipped) arrives afterwards and swaps itself in. Until it does, the
-hero shows a real cake photo rather than an empty box, so nothing pops.
+The page ships **119 kB of JavaScript gzipped** and **about 580 kB in total** on
+first load. Some rules that keep it there, worth respecting when adding things:
 
-Photos are served at two sizes. The gallery and lightbox use `/photos` at 1000px
-wide; the 3D carousel uses `/photos/thumb` at 520px, which keeps GPU memory
-sane on phones. `thumbOf()` in `lib/site.ts` maps between them.
+**No WebGL.** Three.js used to render a few decorative cake prints and cost
+238 kB gzipped plus a canvas on top of the whole page. Those accents are plain
+`<img>` tags now and look the same. Do not reach for a 3D library again without
+a reason that earns 238 kB.
 
-## The 3D setup
+**Images are WebP at two sizes.** See `public/README.md`. Most of the page reads
+the 560px thumb; only the lightbox loads the 1000px version.
 
-Every 3D moment draws into **one** WebGL canvas (`SharedCanvas`) using drei's
-`<View>`, which scissors a region per placement. The hero carousel is a single
-view holding all twelve cakes rather than one view per cake.
+**Animate transform and opacity, nothing else.** Animating a colour on a blurred
+element repaints the blur every single frame, which was the single most
+expensive thing on this page. The hero's ambient light is now one static
+gradient per accent colour with only opacity crossfading, which the compositor
+handles on its own.
 
-`<Stage3D>` frames each subject with `distance` and `elevation` (degrees above
-the subject) rather than a raw camera position.
+**Watch the layer count.** Every animated element becomes a compositor layer.
+The sprinkle field is one element per sprinkle with fall, drift and tumble baked
+into a single keyframe track, rather than three nested animated elements. That
+change alone took the page from 83 composited layers to 7.
 
-One consequence worth knowing: **the canvas paints above the whole page**, so no
-DOM element can sit on top of a 3D print. Anything that must overlay one has to
-be built into the 3D scene instead.
+**Scrolling is native.** A JS smoothing library was running a rAF loop every
+frame and adding input lag. `scroll-behavior: smooth` does the anchors.
 
 ## House style for copy
 
@@ -80,12 +79,11 @@ Prices are deliberately absent. Every enquiry goes to WhatsApp or a phone call.
 - **Cake names** were written from the photographs. Rename freely in
   `lib/site.ts`; the gallery and hero both read from that one list.
 
-To add a cake: drop the JPG into `public/photos`, a 520px copy into
+To add a cake: drop a 1000px WebP into `public/photos`, a 560px copy into
 `public/photos/thumb`, and add an entry to `cakes`. It joins the gallery and the
-hero carousel automatically.
+hero deck automatically.
 
 ## Stack
 
-Vite · React · TypeScript · Tailwind CSS v4 · Three.js via react-three-fiber and
-drei · Framer Motion · Lenis. Fonts (Fraunces, Plus Jakarta Sans, Caveat) are
+Vite · React · TypeScript · Tailwind CSS v4 · Framer Motion. Fonts (Fraunces, Plus Jakarta Sans, Caveat) are
 self hosted through Fontsource, so there is no external font request.
