@@ -27,10 +27,12 @@ export function Nav() {
       >
         <div
           className={cx(
-            'mx-auto flex max-w-6xl items-center justify-between gap-4 rounded-full px-3 py-2 transition-all duration-500 sm:px-4',
+            // always glassed: the hero puts photographs directly behind the
+            // bar, and a transparent nav is unreadable over them
+            'glass mx-auto flex max-w-6xl items-center justify-between gap-4 rounded-full border-2 border-ink px-3 py-2 transition-shadow duration-500 sm:px-4',
             scrolled
-              ? 'glass border-2 border-ink shadow-[0_10px_30px_-14px_rgba(22,18,30,0.45)]'
-              : 'border-2 border-transparent',
+              ? 'shadow-[0_10px_30px_-14px_rgba(22,18,30,0.45)]'
+              : 'shadow-[0_6px_20px_-12px_rgba(22,18,30,0.35)]',
           )}
         >
           <Logo />
