@@ -131,7 +131,7 @@ export function Hero() {
           animate={{ opacity: 1, y: 0, rotate: 0 }}
           transition={{ duration: 1, ease: soft, delay: 0.5 }}
           style={{ opacity: fade }}
-          className="relative z-10 mx-auto h-[23rem] w-full max-w-[18rem] sm:h-[28rem] sm:max-w-[22rem] lg:h-[32rem]"
+          className="relative z-10 mx-auto mb-20 h-[23rem] w-full max-w-[18rem] sm:h-[28rem] sm:max-w-[22rem] lg:h-[32rem]"
         >
           <CakeStack onAccent={onAccent} />
         </motion.div>

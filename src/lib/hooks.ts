@@ -57,6 +57,13 @@ export const usePrefersReducedMotion = () =>
 /** Drops the 3D scenes on small screens where they cost more than they give. */
 export const useIsDesktop = () => useMediaQuery('(min-width: 768px)')
 
+/**
+ * True only for real pointing devices. Touch screens fire pointerenter on tap
+ * and often never fire the matching pointerleave, so anything that pauses on
+ * hover has to check this first or it stays paused forever on a phone.
+ */
+export const useHasHover = () => useMediaQuery('(hover: hover) and (pointer: fine)')
+
 /** Tracks whether the page has scrolled past a threshold (for the sticky nav). */
 export function useScrolled(threshold = 24) {
   const [scrolled, setScrolled] = useState(false)
