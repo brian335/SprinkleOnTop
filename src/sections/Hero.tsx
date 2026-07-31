@@ -1,6 +1,7 @@
 import { motion, useScroll, useTransform } from 'framer-motion'
 import { useCallback, useRef, useState } from 'react'
 import { CakeStack } from '../components/CakeStack'
+import { SprinkleField } from '../components/SprinkleField'
 import { Button, Highlight, WhatsAppIcon, ArrowIcon } from '../components/ui'
 import { soft } from '../lib/motion'
 import { accentHex, site, whatsappLink } from '../lib/site'
@@ -42,6 +43,11 @@ export function Hero() {
         />
         <div className="absolute top-1/4 left-1/3 h-[26rem] w-[26rem] rounded-full bg-butter/30 blur-[90px]" />
       </div>
+
+      {/* sprinkles falling through the section, which is the least the name
+          deserves. Fine ones behind the content, a few larger and slower in
+          front, so the field reads as depth rather than a flat overlay. */}
+      <SprinkleField count={30} seed={11} layer="back" className="z-0" />
 
       <div className="mx-auto grid w-full max-w-6xl items-center gap-9 px-5 sm:gap-12 sm:px-8 lg:grid-cols-[1.05fr_0.95fr] lg:gap-10">
         <motion.div style={{ y: textY, opacity: fade }} className="relative z-20 max-w-xl">
@@ -136,6 +142,8 @@ export function Hero() {
           <CakeStack onAccent={onAccent} />
         </motion.div>
       </div>
+
+      <SprinkleField count={8} seed={29} layer="front" className="z-30" />
 
       <motion.div
         style={{ opacity: fade }}
